@@ -110,6 +110,7 @@ class GameGraph:
 		else:
 			board_score[root] = min(board_score.values())
 
+
 		return board_score
 
 	# prints chosen board state and immediate future board states
@@ -141,7 +142,7 @@ class AI:
 	def __init__(self, first, game):
 		self.first = first # bool
 		self.game = game # GameGraph
-		self.board_score = game.minimax(game.root, 0, first)
+		self.board_score = game.minimax(game.root, 0)
 
 	# returns node/string representing best board state for AI
 	def turn(self, root):
@@ -149,14 +150,14 @@ class AI:
 		adj_nodes = self.game.getAdjacentNodes(root)
 		if (len(adj_nodes) == 0):
 			return "ENDENDEND"
-		print("------")
+		# print(">>>")
 		for next in adj_nodes:
 			moves[next] = self.board_score[next]
 
-			print(nodeToStr(next))
-			print(self.board_score[next])
+			# print(nodeToStr(next))
+			# print(self.board_score[next])
 
-		print("------")
+		# print("<<<")
 		if (self.first): return max(moves, key=moves.get)
 		return min(moves, key=moves.get)
 
@@ -177,14 +178,25 @@ print(nodeToStr() + "\n")
 
 computer2 = AI(False, board)
 
-state = EMPTYBOARD
+# state = EMPTYBOARD
+# state = "----o----"
+state = testNode
 print(nodeToStr(state) + "\n")
 while (state != "ENDENDEND"):
+
 	state = computer.turn(state)
 	print(nodeToStr(state) + "\n")
 	state = computer2.turn(state)
 	print(nodeToStr(state) + "\n")
 
+# state = "----o----"
+# print(nodeToStr(state) + "\n")
+# while (state != "ENDENDEND"):
+#
+# 	state = computer2.turn(state)
+# 	print(nodeToStr(state) + "\n")
+# 	state = computer.turn(state)
+# 	print(nodeToStr(state) + "\n")
 with open('output.json', 'w+') as f:
 	json.dump(board.nodes, f, indent="\t")
 
