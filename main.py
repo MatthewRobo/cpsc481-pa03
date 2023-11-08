@@ -14,7 +14,7 @@ class GameGraph:
 		self.root = BLANK * 9  # "---------", blank board
 		self.nodes = {self.root: []}  # dict of key=board state and values=child (future) states of board
 		self.generateTree()
-		self.board_score = self.minimax()
+		self.board_score = self.minimax() # we can pre-populate the minimax values
 
 	# adds nodes and adjacent nodes to the graph
 	def addNode(self, root, adj):
@@ -55,8 +55,9 @@ class GameGraph:
 		# 	print(self.nodeToStr(i))
 		return adj
 
-	# returns true if either a winner exists or all positions are filled, false otherwise
 
+	# returns >0 if 1st player wins, <0 if 2nd player wins, and 0 if tie
+	# depth is used so that the AI prioritizes stalling over an immediate loss (this would normally not occur due to the AI being unbeatable)
 	def score(self, root, depth):
 		match getWinner(root):
 			case 1:
@@ -66,6 +67,7 @@ class GameGraph:
 			case _:
 				return 0
 
+	# populates a dict with minimax score values for each board
 	def minimax(self, root = None, depth = 0, maximizing=True):
 		if (root == None):
 			root = self.root
@@ -84,11 +86,10 @@ class GameGraph:
 		else:
 			board_score[root] = min(board_score.values())
 
-
 		return board_score
 
 	# prints chosen board state and immediate future board states
-	def printNode(self, root=None):
+	def printNodes(self, root=None):
 		if (root is None):
 			root = self.root
 
@@ -97,9 +98,9 @@ class GameGraph:
 		for adj in self.getAdjacentNodes(root):
 			print(nodeToStr(adj) + "\n")
 
-# returns a board state in |-|-|-| format
-#                          |-|-|-|
-#                          |-|-|-|
+# returns a board state in |7|-|9| format
+# board goes from          |-|5|-|
+# bottom to top            |1|-|3|
 def nodeToStr(root=None):
 	if (root is None):
 		root = "123456789"
@@ -111,6 +112,7 @@ def nodeToStr(root=None):
 		rows.append("|" + "|".join(subStr) + "|")
 	return "\n".join(rows)
 
+# returns true if either a winner exists or all positions are filled, false otherwise
 def isGameOver(root):
 	# checks to see if board is filled
 	if (BLANK not in root):
@@ -127,6 +129,7 @@ def isGameOver(root):
 				return True
 	return False
 
+# returns 1 if first player wins, -1 if second player wins, and 0 if a tie occurs
 def getWinner(root):
 	for line in [[6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]:
 		grid0 = root[line[0]]
@@ -143,23 +146,21 @@ class AI:
 		self.game = game # GameGraph
 		self.board_score = game.board_score
 
-	# returns node/string representing best board state for AI
+	# returns node/string representing best next board state for AI
 	def turn(self, root):
 		moves = {}
 		adj_nodes = self.game.getAdjacentNodes(root)
 		if (len(adj_nodes) == 0):
 			return root
-		# print(">>>")
 		for next in adj_nodes:
 			moves[next] = self.board_score[next]
 
-			# print(nodeToStr(next))
-			# print(self.board_score[next])
+		# pick max if AI is playing for P1 slot, min otherwise
 		first = getFirst(root)
-		# print("<<<")
 		if (first): return max(moves, key=moves.get)
 		return min(moves, key=moves.get)
 
+# returns 1 if P1 is next to make a move, 0 otherwise
 def getFirst(root):
 	return root.count(BLANK) % 2
 
