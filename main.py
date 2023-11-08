@@ -148,7 +148,7 @@ class AI:
 		moves = {}
 		adj_nodes = self.game.getAdjacentNodes(root)
 		if (len(adj_nodes) == 0):
-			return "ENDENDEND"
+			return root
 		# print(">>>")
 		for next in adj_nodes:
 			moves[next] = self.board_score[next]
@@ -188,15 +188,27 @@ class LiveGame:
 			self.board = self.opponent.turn(self.board)
 			print("AI turn: \n" + nodeToStr(self.board))
 
-		while(not isGameOver(self.board)):
-
+		gameOver = isGameOver(self.board)
+		while(not gameOver):
 			isValid = self.playerTurn()
 			while(not isValid):
 				isValid = self.playerTurn()
 			print(nodeToStr(self.board))
+			gameOver = isGameOver(self.board)
+			if (gameOver): break; # this will never be used because the AI cannot lose
 
 			self.board = self.opponent.turn(self.board)
 			print("AI turn: \n" + nodeToStr(self.board))
+			gameOver = isGameOver(self.board)
+
+		winner = getWinner(self.board)
+		result = "Nobody WINS"
+		match winner:
+			case 1: result = "Player \'" + FIRST + "\' WINS"
+			case -1: result = "Player \'" + SECOND + "\' WINS"
+
+		print(result)
+		print("Final board: ")
 		print(nodeToStr(self.board))
 
 
