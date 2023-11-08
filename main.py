@@ -44,7 +44,7 @@ class GameGraph:
 		if isGameOver(root):
 			return adj  # empty list, means no further possible states
 
-		next = SECOND if (root.count(FIRST) > root.count(SECOND)) else FIRST
+		next = FIRST if getFirst(root) else SECOND
 		for i in range(9):
 			if (root[i] == BLANK):
 				newNode = root[:i] + next + root[i + 1:]
@@ -150,50 +150,75 @@ class AI:
 		if (len(adj_nodes) == 0):
 			return "ENDENDEND"
 		# print(">>>")
-		first = root.count(BLANK) % 2
 		for next in adj_nodes:
 			moves[next] = self.board_score[next]
 
 			# print(nodeToStr(next))
 			# print(self.board_score[next])
-
+		first = getFirst(root)
 		# print("<<<")
 		if (first): return max(moves, key=moves.get)
 		return min(moves, key=moves.get)
 
+def getFirst(root):
+	return root.count(BLANK) % 2
 
+class LiveGame:
+	def __init__(self, game, userFirst = True):
+		self.game = game # GameGraph
+		self.userFirst = userFirst
+		self.board = self.game.root
+		self.opponent = AI(self.game)
 
+	def playerTurn(self):
+		next = FIRST if getFirst(self.board) else SECOND
+		adj_nodes = self.game.getAdjacentNodes(self.board)
+		index = int(input("Input your next position: [1-9]\nYour turn: ")) - 1
+		newBoard = self.board[:index] + next + self.board[index + 1:]
+		if (newBoard not in adj_nodes):
+			print("Invalid move")
+			return False # error
+		self.board = newBoard
+		return True
+
+	def gameLoop(self):
+		print(nodeToStr())
+		# AI first turn if human not first
+		if (not self.userFirst):
+			self.board = self.opponent.turn(self.board)
+			print("AI turn: \n" + nodeToStr(self.board))
+
+		while(not isGameOver(self.board)):
+
+			isValid = self.playerTurn()
+			while(not isValid):
+				isValid = self.playerTurn()
+			print(nodeToStr(self.board))
+
+			self.board = self.opponent.turn(self.board)
+			print("AI turn: \n" + nodeToStr(self.board))
+		print(nodeToStr(self.board))
 
 
 board = GameGraph()
-
-
-computer = AI(board)
-testNode = "o---x--xo"
-print(nodeToStr() + "\n")
-
-
-
-# state = EMPTYBOARD
-# state = "----o----"
-state = testNode
-print(nodeToStr(state) + "\n")
-while (state != "ENDENDEND"):
-
-	state = computer.turn(state)
-	print(nodeToStr(state) + "\n")
-
-
-# state = "----o----"
-# print(nodeToStr(state) + "\n")
-# while (state != "ENDENDEND"):
-#
-# 	state = computer2.turn(state)
-# 	print(nodeToStr(state) + "\n")
-# 	state = computer.turn(state)
-# 	print(nodeToStr(state) + "\n")
 with open('output.json', 'w+') as f:
 	json.dump(board.nodes, f, indent="\t")
 
+#
+# opponent = AI(board)
+# print(nodeToStr() + "\n")
+#
+# testNode = "o---x--xo"
+# state = EMPTYBOARD
+# # state = "----o----"
+# # state = testNode
+# print(nodeToStr(state) + "\n")
+# while (not isGameOver(state)):
+# 	state = opponent.turn(state)
+# 	print(nodeToStr(state) + "\n")
 
-
+userMark = input("Pick a side: \n" +
+				 "Input \'" + FIRST + "\' to go first\n" +
+				 "Input \'" + SECOND + "\' to go second\n")
+game = LiveGame(board, userMark == FIRST)
+game.gameLoop()
