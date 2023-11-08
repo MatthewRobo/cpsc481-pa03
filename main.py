@@ -10,11 +10,11 @@ BLANK = "-"
 EMPTYBOARD = BLANK * 9
 
 class GameGraph:
-	def __init__(self, root=None):
-		self.root = root
-		if (root is None):
-			self.root = BLANK * 9  # "---------", blank board
+	def __init__(self):
+		self.root = BLANK * 9  # "---------", blank board
 		self.nodes = {self.root: []}  # dict of key=board state and values=child (future) states of board
+		self.generateTree()
+		self.board_score = self.minimax()
 
 	# adds nodes and adjacent nodes to the graph
 	def addNode(self, root, adj):
@@ -142,7 +142,7 @@ class AI:
 	def __init__(self, first, game):
 		self.first = first # bool
 		self.game = game # GameGraph
-		self.board_score = game.minimax(game.root, 0)
+		self.board_score = game.board_score
 
 	# returns node/string representing best board state for AI
 	def turn(self, root):
@@ -167,9 +167,6 @@ class AI:
 
 board = GameGraph()
 
-board.generateAdjacentNodes(board.root)
-board.generateTree()
-# board.minimax()
 
 computer = AI(True, board)
 testNode = "o---x--xo"
