@@ -41,7 +41,7 @@ class GameGraph:
 	# returns list of next board states
 	def generateAdjacentNodes(self, root):
 		adj = []
-		if self.isGameOver(root):
+		if isGameOver(root):
 			return adj  # empty list, means no further possible states
 
 		next = SECOND if (root.count(FIRST) > root.count(SECOND)) else FIRST
@@ -56,35 +56,9 @@ class GameGraph:
 		return adj
 
 	# returns true if either a winner exists or all positions are filled, false otherwise
-	def isGameOver(self, root):
-		# checks to see if board is filled
-		if (BLANK not in root):
-			return True
-
-		# checks to see if board has three-in-row
-		for line in [[6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]:
-			grid0 = root[line[0]]
-			grid1 = root[line[1]]
-			grid2 = root[line[2]]
-
-			if (grid0 != BLANK):
-				if (grid0 == grid1 and grid1 == grid2):
-					return True
-		return False
-
-	def getWinner(self, root):
-		for line in [[6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]:
-			grid0 = root[line[0]]
-			grid1 = root[line[1]]
-			grid2 = root[line[2]]
-
-			if (grid0 != BLANK):
-				if (grid0 == grid1 and grid1 == grid2):
-					return 1 if grid0 == FIRST else -1
-		return 0 # on tie
 
 	def score(self, root, depth):
-		match self.getWinner(root):
+		match getWinner(root):
 			case 1:
 				return 10 - depth
 			case -1:
@@ -95,7 +69,7 @@ class GameGraph:
 	def minimax(self, root = None, depth = 0, maximizing=True):
 		if (root == None):
 			root = self.root
-		if (self.isGameOver(root)):
+		if (isGameOver(root)):
 			return {root: self.score(root, depth)}
 
 		depth += 1
@@ -137,6 +111,32 @@ def nodeToStr(root=None):
 		rows.append("|" + "|".join(subStr) + "|")
 	return "\n".join(rows)
 
+def isGameOver(root):
+	# checks to see if board is filled
+	if (BLANK not in root):
+		return True
+
+	# checks to see if board has three-in-row
+	for line in [[6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]:
+		grid0 = root[line[0]]
+		grid1 = root[line[1]]
+		grid2 = root[line[2]]
+
+		if (grid0 != BLANK):
+			if (grid0 == grid1 and grid1 == grid2):
+				return True
+	return False
+
+def getWinner(root):
+	for line in [[6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]:
+		grid0 = root[line[0]]
+		grid1 = root[line[1]]
+		grid2 = root[line[2]]
+
+		if (grid0 != BLANK):
+			if (grid0 == grid1 and grid1 == grid2):
+				return 1 if grid0 == FIRST else -1
+	return 0 # on tie
 
 class AI:
 	def __init__(self, first, game):
