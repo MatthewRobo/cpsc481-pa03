@@ -139,8 +139,7 @@ def getWinner(root):
 	return 0 # on tie
 
 class AI:
-	def __init__(self, first, game):
-		self.first = first # bool
+	def __init__(self, game):
 		self.game = game # GameGraph
 		self.board_score = game.board_score
 
@@ -151,6 +150,7 @@ class AI:
 		if (len(adj_nodes) == 0):
 			return "ENDENDEND"
 		# print(">>>")
+		first = root.count(BLANK) % 2
 		for next in adj_nodes:
 			moves[next] = self.board_score[next]
 
@@ -158,7 +158,7 @@ class AI:
 			# print(self.board_score[next])
 
 		# print("<<<")
-		if (self.first): return max(moves, key=moves.get)
+		if (first): return max(moves, key=moves.get)
 		return min(moves, key=moves.get)
 
 
@@ -168,12 +168,11 @@ class AI:
 board = GameGraph()
 
 
-computer = AI(True, board)
+computer = AI(board)
 testNode = "o---x--xo"
 print(nodeToStr() + "\n")
 
 
-computer2 = AI(False, board)
 
 # state = EMPTYBOARD
 # state = "----o----"
@@ -183,8 +182,7 @@ while (state != "ENDENDEND"):
 
 	state = computer.turn(state)
 	print(nodeToStr(state) + "\n")
-	state = computer2.turn(state)
-	print(nodeToStr(state) + "\n")
+
 
 # state = "----o----"
 # print(nodeToStr(state) + "\n")
