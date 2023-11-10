@@ -196,7 +196,7 @@ class LiveGame:
 				isValid = self.playerTurn()
 			print(nodeToStr(self.board))
 			gameOver = isGameOver(self.board)
-			if (gameOver): break; # this will never be used because the AI cannot lose
+			if (gameOver): break # this will never be used because the AI cannot lose
 
 			self.board = self.opponent.turn(self.board)
 			print("AI turn: \n" + nodeToStr(self.board))
@@ -205,9 +205,9 @@ class LiveGame:
 		winner = getWinner(self.board)
 		result = "Nobody WINS"
 		match winner:
-			case 1: result = "Player \'" + FIRST + "\' WINS"
-			case -1: result = "Player \'" + SECOND + "\' WINS"
-
+			case 1: result = f"Player {FIRST} WINS"
+			case -1: result = f"Player {SECOND} WINS"
+ 
 		print(result)
 		print("Final board: ")
 		print(nodeToStr(self.board))
